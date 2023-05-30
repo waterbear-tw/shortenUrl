@@ -1,4 +1,4 @@
-function postfixGenerator() {
+export function postfixGenerator() {
   const lowercaseAlph = [
     "a",
     "b",
@@ -67,6 +67,5 @@ function postfixGenerator() {
   }
 
   const postfix = result.join("");
-
   return postfix;
 }
