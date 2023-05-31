@@ -33,11 +33,44 @@ app.get("/", (req, res) => {
 
 //set route POST /new
 app.post("/new", (req, res) => {
-  const url = req.body.url;
-  const postfix = postfixGenerator();
-  console.log(postfix);
-  return Url.create({ url, postfix })
-    .then(() => res.redirect("/"))
+  const requrl = req.body.url; //傳回要縮短的目標網址
+  //輸入資料為空時提示使用者
+  if (requrl.length === 0) {
+    console.log("輸入網址不得為空字串。");
+    return res.redirect("/");
+  }
+
+  Url.find({ url: requrl })
+    .lean()
+    .then((url) => {
+      //判斷目標網址是否存在資料庫中
+      if (url.length !== 0) {
+        console.log(url);
+        res.render("new", { url: url[0] });
+      } else {
+        //目標網址第一次被縮短，產生對應的後綴碼
+        const postfix = postfixGenerator();
+        //將網址和後綴碼存回資料庫
+        return Url.create({ url: requrl, postfix })
+          .then(() => {
+            //直接把輸入資料送到渲染夜面
+            res.render("new", { url: { url: requl, postfix: postfix } });
+          })
+          .catch((error) => console.error(error));
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+
+//route GET /new
+app.get("/new", (req, res) => {
+  Url.find()
+    .lean()
+    .then((url) => {
+      res.render("new", { url });
+    })
     .catch((error) => console.error(error));
 });
 
