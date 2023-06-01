@@ -74,6 +74,17 @@ app.get("/new", (req, res) => {
     .catch((error) => console.error(error));
 });
 
+//route: redirect to real website
+app.get("/:postfix", (req, res) => {
+  const postfix = req.params.postfix;
+  Url.find({ postfix })
+    .lean()
+    .then((url) => {
+      res.redirect(url[0].url);
+    })
+    .catch((error) => console.error(error));
+});
+
 app.listen(3000, () => {
   console.log("Sever on.");
 });
