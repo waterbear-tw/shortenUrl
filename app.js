@@ -34,6 +34,9 @@ app.get("/", (req, res) => {
 //set route POST /new
 app.post("/new", (req, res) => {
   const requrl = req.body.url; //傳回要縮短的目標網址
+  const protocol = req.protocol;
+  const host = req.get("host");
+
   //輸入資料為空時提示使用者
   if (requrl.length === 0) {
     console.log("輸入網址不得為空字串。");
@@ -46,7 +49,7 @@ app.post("/new", (req, res) => {
       //判斷目標網址是否存在資料庫中
       if (url.length !== 0) {
         console.log(url);
-        res.render("new", { url: url[0] });
+        res.render("new", { url: url[0], protocol, host });
       } else {
         //目標網址第一次被縮短，產生對應的後綴碼
         const postfix = postfixGenerator();
@@ -54,7 +57,11 @@ app.post("/new", (req, res) => {
         return Url.create({ url: requrl, postfix })
           .then(() => {
             //直接把輸入資料送到渲染夜面
-            res.render("new", { url: { url: requl, postfix: postfix } });
+            res.render("new", {
+              url: { url: requrl, postfix: postfix },
+              protocol,
+              host,
+            });
           })
           .catch((error) => console.error(error));
       }
@@ -69,6 +76,7 @@ app.get("/new", (req, res) => {
   Url.find()
     .lean()
     .then((url) => {
+      console.log(host);
       res.render("new", { url });
     })
     .catch((error) => console.error(error));
@@ -83,6 +91,17 @@ app.get("/:postfix", (req, res) => {
       res.redirect(url[0].url);
     })
     .catch((error) => console.error(error));
+});
+
+//route: copy
+app.post("/:postfix/copy", (req, res) => {
+  const protocol = req.protocol;
+  const host = req.get("host");
+  const postfix = req.params.postfix;
+  console.log("hi");
+  navigator.clipboard
+    .writeText(`${protocol}://${host}/${postfix}`)
+    .then(() => console.log("OK"));
 });
 
 app.listen(3000, () => {
