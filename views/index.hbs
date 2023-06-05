@@ -8,9 +8,14 @@
       type="text"
       class="form-control"
       name="url"
+      value="{{reqUrl}}"
       placeholder="type in your url here..."
     />
   </div>
   <button class="btn btn-primary btn-sm ms-1" type="submit">Submit</button>
-
 </form>
+{{#if noInput}}
+  <div class="alert alert-danger" role="alert">
+    {{noInput}}
+  </div>
+{{/if}}

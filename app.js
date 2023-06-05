@@ -16,5 +16,5 @@ app.use(express.static("public"));
 
 //啟動伺服器
 app.listen(3000, () => {
-  console.log("Sever on.");
+  console.log("Sever is now running on 'http://localhost:3000/' .");
 });
