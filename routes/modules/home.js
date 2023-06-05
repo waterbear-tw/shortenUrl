@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Url = require("../../models/url");
 const bodyParser = require("body-parser");
-
+const postfixGenerator = require("../../functions/postfixGenerator"); //引入產生後綴的fnction
 //設定
 router.use(bodyParser.urlencoded({ extended: true }));
 
