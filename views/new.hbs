@@ -1,13 +1,7 @@
-<div class="title">
-  <h1>URL Shortener</h1>
-</div>
-<img src="icon.png" alt="icon" style="width:15%" />
 <div class="content">
   <h2>Success! Please use following link:</h2>
   <a
+    class="fs-3"
     href="{{protocol}}://{{host}}/{{url.postfix}}"
   >{{protocol}}://{{host}}/{{url.postfix}}</a>
-  <form action="/{{url.postfix}}/copy" method="POST">
-    <button class="copy-url">Copy</button>
-  </form>
 </div>

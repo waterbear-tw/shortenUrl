@@ -1,5 +1,4 @@
 const Url = require("./models/url"); //載入Url Model
-
 const express = require("express");
 const exphbs = require("express-handlebars");
 const bodyParser = require("body-parser");
@@ -24,9 +23,11 @@ db.once("open", () => {
 //exphbs setting
 app.engine("hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
 app.set("view engine", "hbs");
-app.use(express.static("images"));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static("public"));
 
+//route: index
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -71,17 +72,6 @@ app.post("/new", (req, res) => {
     });
 });
 
-//route GET /new
-app.get("/new", (req, res) => {
-  Url.find()
-    .lean()
-    .then((url) => {
-      console.log(host);
-      res.render("new", { url });
-    })
-    .catch((error) => console.error(error));
-});
-
 //route: redirect to real website
 app.get("/:postfix", (req, res) => {
   const postfix = req.params.postfix;
@@ -91,17 +81,6 @@ app.get("/:postfix", (req, res) => {
       res.redirect(url[0].url);
     })
     .catch((error) => console.error(error));
-});
-
-//route: copy
-app.post("/:postfix/copy", (req, res) => {
-  const protocol = req.protocol;
-  const host = req.get("host");
-  const postfix = req.params.postfix;
-  console.log("hi");
-  navigator.clipboard
-    .writeText(`${protocol}://${host}/${postfix}`)
-    .then(() => console.log("OK"));
 });
 
 app.listen(3000, () => {
