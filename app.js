@@ -1,11 +1,12 @@
-const Url = require("./models/url"); //載入Url Model
 const express = require("express");
 const exphbs = require("express-handlebars");
-const bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
 const app = express();
 
+//引入路由
+const routes = require("./routes");
+app.use(routes);
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -23,65 +24,7 @@ db.once("open", () => {
 //exphbs setting
 app.engine("hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
 app.set("view engine", "hbs");
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 app.use(express.static("public"));
-
-//route: index
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-//set route POST /new
-app.post("/new", (req, res) => {
-  const requrl = req.body.url; //傳回要縮短的目標網址
-  const protocol = req.protocol;
-  const host = req.get("host");
-
-  //輸入資料為空時提示使用者
-  if (requrl.length === 0) {
-    console.log("輸入網址不得為空字串。");
-    return res.redirect("/");
-  }
-
-  Url.find({ url: requrl })
-    .lean()
-    .then((url) => {
-      //判斷目標網址是否存在資料庫中
-      if (url.length !== 0) {
-        console.log(url);
-        res.render("new", { url: url[0], protocol, host });
-      } else {
-        //目標網址第一次被縮短，產生對應的後綴碼
-        const postfix = postfixGenerator();
-        //將網址和後綴碼存回資料庫
-        return Url.create({ url: requrl, postfix })
-          .then(() => {
-            //直接把輸入資料送到渲染夜面
-            res.render("new", {
-              url: { url: requrl, postfix: postfix },
-              protocol,
-              host,
-            });
-          })
-          .catch((error) => console.error(error));
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
-
-//route: redirect to real website
-app.get("/:postfix", (req, res) => {
-  const postfix = req.params.postfix;
-  Url.find({ postfix })
-    .lean()
-    .then((url) => {
-      res.redirect(url[0].url);
-    })
-    .catch((error) => console.error(error));
-});
 
 app.listen(3000, () => {
   console.log("Sever on.");
